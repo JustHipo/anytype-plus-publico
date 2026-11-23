@@ -1,0 +1,5 @@
+// plus: guía de la grilla de 12 mientras se arrastra el borde entre columnas
+.block.blockLayout.layoutRow.isResizing > .wrapContent > .children {
+	background-image: repeating-linear-gradient(to right, var(--color-shape-secondary) 0px, var(--color-shape-secondary) 1px, transparent 1px, transparent calc(100% / 12));
+	background-position: 0px 0px; border-right: 1px solid var(--color-shape-secondary);
+}

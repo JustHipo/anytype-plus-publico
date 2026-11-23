@@ -9,7 +9,6 @@ import Constant from '../json/constant.json';
 import { AppWindow, TabView } from './types';
 import { isTrustedUrl } from './lib/trustedUrl';
 
-const protocol = 'anytype';
 
 logger.initialize();
 logger.transports.console.level = 'error';
@@ -65,7 +64,7 @@ class Util {
 	};
 
 	getRouteFromUrl (url: string): string {
-		return String(url || '').replace(`${protocol}://`, '/');
+		return String(url || '').replace(/^anytype(-plus)?:\/\//, '/'); // plus: acepta los dos esquemas
 	};
 
 	getTheme (): string {

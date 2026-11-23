@@ -26,6 +26,7 @@ import 'swiper/css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'scss/common.scss';
+import { openChange, openRecent } from './plus/changeAlerts'; // plus:
 
 const memoryHistory = hs.createMemoryHistory;
 const history = (window as any).__anytypeHistory || memoryHistory();
@@ -590,6 +591,17 @@ const App: FC = () => {
 			case 'openChat': {
 				U.Object.openRoute(payload);
 				analytics.event('OpenChatFromNotification');
+				break;
+			};
+
+			// plus: aviso de cambios de Anytype Plus
+			case 'plusOpenObject': {
+				openChange(payload);
+				break;
+			};
+
+			case 'plusOpenRecent': {
+				openRecent();
 				break;
 			};
 		};

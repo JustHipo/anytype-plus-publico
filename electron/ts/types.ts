@@ -68,6 +68,7 @@ export interface Bounds {
 
 /** Config stored by ConfigManager */
 export interface AppConfig {
+	plusLastVersion?: string; // plus: última versión abierta, para mostrar novedades
 	channel?: string;
 	theme?: string;
 	showMenuBar?: boolean;

@@ -1,6 +1,9 @@
 import React, { forwardRef, useRef, useEffect, useImperativeHandle } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { DropTarget, ListChildren, Icon, SelectionTarget, IconObject, Loader } from 'Component';
+import { isHtmlLive } from '../../plus/htmlLive'; // plus:
+import { snapToGrid, pairFromPointer } from '../../plus/grid'; // plus:
+import { blockStyleClass } from '../../plus/blockStyle'; // plus:
 
 import BlockDataview from './dataview';
 import BlockText from './text';
@@ -38,7 +41,7 @@ interface Ref {
 	getChildNode: () => any;
 };
 
-const SNAP = 0.01;
+// plus: el ajuste a 25/50/75 % (SNAP) se reemplazó por la grilla de 12 (src/ts/plus/grid.ts)
 
 const Block = forwardRef<Ref, Props>((props, ref) => {
 
@@ -453,7 +456,6 @@ const Block = forwardRef<Ref, Props>((props, ref) => {
 	
 	const calcWidth = (x: number, index: number) => {
 		const childrenIds = S.Block.getChildrenIds(rootId, block.id);
-		const snaps = [ 0.25, 0.5, 0.75 ];
 		
 		const prevBlockId = childrenIds[index - 1];
 		const prevBlock = S.Block.getLeaf(rootId, prevBlockId);
@@ -469,17 +471,22 @@ const Block = forwardRef<Ref, Props>((props, ref) => {
 		const dw = 1 / childrenIds.length;
 		const sum = (prevBlock.fields.width || dw) + (currentBlock.fields.width || dw);
 		const offset = J.Size.blockMenu * 2;
-		
+
+		// plus: el borde sigue al puntero con la geometría real de la fila y encaja en una grilla de 12 de la fila
+		// (en vez de 25/50/75 % del par). Anytype mide contra el ancho de la página, que no es el de la fila.
+		const before = childrenIds.slice(0, index - 1).reduce((acc, id) => acc + (S.Block.getLeaf(rootId, id)?.fields?.width || dw), 0);
+		const childrenEl = nodeRef.current ? U.Dom.select(`#block-children-${U.Common.esc(block.id)}`, nodeRef.current) : null;
+		const prevEl = nodeRef.current ? U.Dom.select(`#block-${U.Common.esc(prevBlockId)}`, nodeRef.current) : null;
+
+		if (childrenEl && prevEl) {
+			const pageX = x + prevEl.getBoundingClientRect().left + J.Size.blockMenu;
+			return { sum, percent: snapToGrid(before, sum, pairFromPointer(pageX, childrenEl.getBoundingClientRect(), before, sum)) };
+		};
+
 		x = Math.max(offset, x);
 		x = Math.min(sum * width - offset, x);
 		x = x / (sum * width);
-		
-		// Snap
-		for (const s of snaps) {
-			if ((x >= s - SNAP) && (x <= s + SNAP)) {
-				x = s;
-			};
-		};
+		x = snapToGrid(before, sum, x);
 
 		return { sum, percent: x };
 	};
@@ -984,6 +991,9 @@ const Block = forwardRef<Ref, Props>((props, ref) => {
 	if (className) {
 		cn.push(className);
 	};
+	if (blockStyleClass(block)) {
+		cn.push(blockStyleClass(block)); // plus: estilo de bloque (tarjeta)
+	};
 	if (fields.isUnwrapped) {
 		cn.push('isUnwrapped');
 	};
@@ -1001,7 +1011,7 @@ const Block = forwardRef<Ref, Props>((props, ref) => {
 	switch (type) {
 		case I.BlockType.Text: {
 			canDropMiddle = canDrop && block.canHaveChildren();
-			renderChildren = !isInsideTable;
+			renderChildren = !isInsideTable && !isHtmlLive(block); // plus: el HTML en vivo dibuja sus hijos donde el HTML los pone
 
 			if (block.isTextCheckbox() && checked) {
 				cn.push('isChecked');

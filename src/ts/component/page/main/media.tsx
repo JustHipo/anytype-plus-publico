@@ -2,6 +2,7 @@ import React, { forwardRef, useState, useRef, useEffect } from 'react';
 import { Header, Footer, Loader, Block, Button, IconObject, Deleted, HeadSimple, ObjectCreatedIn } from 'Component';
 import * as I from 'Interface';
 import * as M from 'Model';
+import PlusDocxViewer, { isDocxObject } from '../../../plus/docxViewer'; // plus:
 
 const MAX_HEIGHT = 396;
 
@@ -170,6 +171,7 @@ const PageMainMedia = forwardRef<I.PageRef, I.PageComponent>((props, ref) => {
 	const isImage = file?.isFileImage();
 	const isAudio = file?.isFileAudio();
 	const isPdf = file?.isFilePdf();
+	const isDocx = !isPdf && isDocxObject(object); // plus: visor de DOCX
 	const cn = [ 'blocks' ];
 	const data = sidebar.getData(I.SidebarPanel.Right, isPopup);
 
@@ -191,6 +193,9 @@ const PageMainMedia = forwardRef<I.PageRef, I.PageComponent>((props, ref) => {
 		if (isPdf) {
 			cn.push('isPdf');
 		};
+	} else
+	if (isDocx) {
+		cn.push('vertical', 'isPdf', 'isDocx'); // plus: el DOCX usa el mismo espacio que el PDF
 	} else {
 		cn.push('horizontal');
 	};
@@ -217,6 +222,10 @@ const PageMainMedia = forwardRef<I.PageRef, I.PageComponent>((props, ref) => {
 					isSelectionDisabled={true} 
 				/>
 			);
+			cn.push('withContent');
+		} else
+		if (isDocx) {
+			content = <PlusDocxViewer fileId={object.id} />; // plus: visor de DOCX
 			cn.push('withContent');
 		} else {
 			content = <IconObject object={object} size={160} />;

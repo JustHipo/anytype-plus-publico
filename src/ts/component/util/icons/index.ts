@@ -21,6 +21,7 @@ import './banner';
 import './import';
 import './counter';
 import './plus';
+import '../../../plus/icons'; // plus: íconos propios de Anytype Plus
 import './block';
 import './menu/block/embed';
 import './arrow';

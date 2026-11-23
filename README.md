@@ -1,3 +1,9 @@
+> **Esta es la rama `anytype-plus`: un fork personal de Anytype.** Agrega páginas y bloques HTML vivos, formato de páginas, temas Solarized, visor de DOCX y avisos de cambios para equipos, sin salir de la red oficial. Ver [plus/README.md](plus/README.md).
+>
+> ![Página HTML con un kanban nativo incrustado](plus/capturas/pagina-html-con-kanban.png)
+>
+> Lo que sigue es el README original de Anytype.
+
 # Anytype Desktop
 
 > **Local‑first, peer‑to‑peer & end‑to‑end‑encrypted knowledge OS for macOS, Windows & Linux.**

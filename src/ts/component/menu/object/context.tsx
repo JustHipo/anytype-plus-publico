@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useImperativeHandle } from 'react';
+import { getCopyForHtmlItem, copyForHtml, PLUS_COPY_ITEM_ID } from '../../../plus/copyForHtml'; // plus:
 import { MenuItemVertical } from 'Component';
 import * as I from 'Interface';
 import { focus } from 'Lib/focus';
@@ -229,7 +230,7 @@ const MenuObjectContext = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 		let sections = [
 			{ children: [ open, changeType, relation ] },
 			{ children: [ fav, pin, notification, editChat, linkTo, addCollection ] },
-			{ children: [ pageLink, pageCopy, exportObject, unlink, archive ] },
+			{ children: [ pageLink, pageCopy, exportObject, (pageLink ? getCopyForHtmlItem() : null), unlink, archive ] }, // plus: Copiar para HTML junto a Exportar (solo con un objeto)
 			{ children: [ newTab, newWindow ] },
 		];
 
@@ -443,6 +444,12 @@ const MenuObjectContext = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 
 			case 'pageLink': {
 				U.Object.copyLink(first, spaceview, 'web', route);
+				break;
+			};
+
+			// plus:
+			case PLUS_COPY_ITEM_ID: {
+				copyForHtml(first);
 				break;
 			};
 

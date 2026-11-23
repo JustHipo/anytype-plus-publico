@@ -1,0 +1,38 @@
+// plus: Página HTML a página completa (modo vista). El HTML ocupa la página: sin título, sin marco de bloque
+// y sin controles del editor. El botón de arriba a la derecha pasa a modo edición, que es la página normal
+// de Anytype con su título, el código y la vista previa.
+
+#bodyWrapper:has(.flex.isPlusPage) {
+	#editorWrapper { width: 100% !important; }
+	// Los bloques de Anytype dejan 48px a la izquierda para su manija; se compensan para que el HTML quede
+	// con el mismo margen (32px) a ambos lados
+	#editorWrapper .editor { margin: 0px; padding: 16px 32px 80px 80px; }
+
+	.editor > .blocks > #editorSize,
+	.editor > .blocks > #button-block-add,
+	.editor > .blocks > div:has(> #block-header),
+	.editor > .blocks > .block:not(:has(.flex.isPlusPage)),
+	.editor > .blockLast { display: none !important; }
+
+	.block.blockText.textCode:has(.flex.isPlusPage) { padding: 0px; }
+	.block.blockText.textCode:has(.flex.isPlusPage) > .wrapMenu { display: none; }
+	.block.blockText.textCode:has(.flex.isPlusPage) > .wrapContent { background: none; border-radius: 0px; }
+	.block.blockText.textCode:has(.flex.isPlusPage) > .wrapContent > .selectionTarget > .dropTarget { padding: 0px; }
+
+	.flex.isPlusPage {
+		.plusHtmlNative, .plusHtmlLive { padding: 0px; }
+
+		// Del encabezado del bloque solo queda el botón para editar, como ícono en el margen izquierdo:
+		// fuera del contenido, para no tapar enlaces del HTML
+		.additional { position: absolute; top: 0px; left: -40px; right: auto; width: 32px; padding: 0px; z-index: 5; }
+		.additional .select, .additional .buttons .btn:not(.plusToggle) { display: none; }
+		.additional .buttons { position: static; opacity: 0; }
+		.additional .buttons .btn.plusToggle {
+			width: 28px; height: 28px; padding: 0px; justify-content: center; border-radius: 6px; background: var(--color-bg-primary);
+			box-shadow: 0px 0px 0px 1px var(--color-shape-secondary); color: var(--color-text-secondary);
+		}
+		.additional .buttons .btn.plusToggle .txt { display: none; }
+		.additional .buttons .btn.plusToggle:hover { color: var(--color-text-primary); }
+	}
+	.block.blockText.textCode:has(.flex.isPlusPage):hover .additional .buttons { opacity: 1; }
+}

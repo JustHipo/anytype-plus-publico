@@ -250,8 +250,9 @@
 
 					> .flex { position: static; }
 					> .flex {
-						#value { font-family: 'Plex'; @include text-common; tab-size: 4; white-space: pre-wrap; padding: 16px; }
-						#value {
+						// plus: `> .editableWrap >` para no alcanzar el texto de un documento incrustado dentro del HTML
+						> .editableWrap > #value { font-family: 'Plex'; @include text-common; tab-size: 4; white-space: pre-wrap; padding: 16px; }
+						> .editableWrap > #value {
 							* { background: none; }
 							.title { @include text-common; font-weight: 400; }
 						}
@@ -296,7 +297,7 @@
 		.additional .buttons { display: none; }
 	}
 	.block.blockText.textCode.isUnwrapped > .wrapContent > .selectionTarget > .dropTarget > .flex {
-		#value { white-space: pre; overflow-x: scroll; }
+		> .editableWrap > #value { white-space: pre; overflow-x: scroll; } // plus: acotado, como la regla del código
 	}
 
 	/* DropTarget */

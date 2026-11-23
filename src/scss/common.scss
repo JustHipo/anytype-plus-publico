@@ -179,6 +179,7 @@ a { color: var(--color-text-primary); }
 
 @import "./media/print.scss";
 @import "./theme/dark/common.scss";
+@import "./plus/index.scss"; // plus:
 
 html {
 	&.isSingleTab {

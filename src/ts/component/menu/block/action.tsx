@@ -3,6 +3,7 @@ import React, { forwardRef, useRef, useEffect, useImperativeHandle } from 'react
 import { Filter, MenuItemVertical } from 'Component';
 import * as I from 'Interface';
 import { focus } from 'Lib/focus';
+import { getBlockStyleItem, getBlockStyleMenuData, getEmbedToggleItem, toggleEmbed, PLUS_STYLE_ITEM_ID, PLUS_EMBED_ITEM_ID } from '../../../plus/blockStyle'; // plus:
 
 const CB_KEYS = { c: 'clipboardCopy', x: 'clipboardCut', v: 'clipboardPaste' };
 
@@ -214,12 +215,14 @@ const MenuBlockAction = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 
 			const c1: any[] = [
 				hasLink ? { id: 'linkSettings', name: translate('commonView'), caption: translate(`menuBlockLinkSettingsStyle${I.LinkCardStyle[cardStyle]}`), arrow: true } : null,
+				hasLink ? getEmbedToggleItem(block) : null, // plus: mostrar el objeto completo
 				hasTurnFile ? { id: 'turnStyle', name: translate('commonView'), caption: translate(`blockName${I.FileStyle[style]}`), arrow: true, isBlockFile: true } : null,
 				(hasTurnText && !isCardStyle) ? turnText : null,
 				hasTurnDiv ? { id: 'turnStyle', iconParam: { name: U.Data.styleIcon(I.BlockType.Div, style) }, name: translate('menuBlockActionsSectionsDividerStyle'), arrow: true, isBlockDiv: true } : null,
 				hasAlign ? { id: 'align', name: translate('commonAlign'), caption: translate(`commonHAlign${I.BlockHAlign[hAlign]}`), arrow: true } : null,
 				hasColor ? { id: 'color', name: translate('commonColor'), arrow: true, isTextColor: true, value: (color || 'default') } : null,
 				hasBg ? { id: 'background', name: translate('commonBackground'), arrow: true, isBgColor: true, value: (bgColor || 'default') } : null,
+				hasAction ? getBlockStyleItem(block) : null, // plus: estilo de bloque (tarjeta)
 				hasText ? { id: 'clear', name: translate('libMenuClearStyle') } : null,
 			].filter(it => it);
 			let actionSections: any[] = [];
@@ -505,6 +508,13 @@ const MenuBlockAction = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 				break;
 			};
 
+			// plus: estilo de bloque (tarjeta)
+			case PLUS_STYLE_ITEM_ID: {
+				menuId = 'select';
+				menuParam.data = Object.assign(menuParam.data, getBlockStyleMenuData(rootId, selection?.getForClick(blockId, true, false) || blockIds, String(block?.fields?.plusStyle || ''), close));
+				break;
+			};
+
 			case 'align': {
 				menuId = 'blockAlign';
 				menuParam.offsetY = 0;
@@ -705,6 +715,12 @@ const MenuBlockAction = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 				break;
 			};
 			
+			// plus: mostrar el objeto enlazado completo, o volver al enlace
+			case PLUS_EMBED_ITEM_ID: {
+				toggleEmbed(rootId, blockIds);
+				break;
+			};
+
 			case 'clear': {
 				C.BlockTextListClearStyle(rootId, blockIds, () => {
 					analytics.event('ClearBlockStyle', { count: blockIds.length });

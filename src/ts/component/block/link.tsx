@@ -3,6 +3,7 @@ import raf from 'raf';
 import { Icon, IconObject, Loader, ObjectName, Cover, Label } from 'Component';
 import * as I from 'Interface';
 import { focus } from 'Lib/focus';
+import PlusEmbedObject, { getEmbedChain } from '../../plus/embedObject'; // plus:
 
 const BlockLink = forwardRef<I.BlockRef, I.BlockComponent>((props, ref) => {
 
@@ -289,6 +290,15 @@ const BlockLink = forwardRef<I.BlockRef, I.BlockComponent>((props, ref) => {
 			resizeObserver.disconnect();
 		};
 	}, []);
+
+	// plus: «Mostrar completo»: el objeto enlazado se ve entero dentro de esta página
+	if (block.fields?.plusEmbed && !_empty_ && !isDeleted && !isArchived) {
+		return (
+			<div ref={nodeRef} className={cn.concat([ 'plusEmbedLink' ]).join(' ')} tabIndex={0} onKeyDown={onKeyDownHandler} onKeyUp={onKeyUpHandler} onFocus={onFocus}>
+				<PlusEmbedObject objectId={block.getTargetObjectId()} spaceId={object.spaceId || S.Common.space} parentIds={getEmbedChain(rootId)} />
+			</div>
+		);
+	};
 
 	return (
 		<div

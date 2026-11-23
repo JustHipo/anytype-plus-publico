@@ -2,6 +2,7 @@ import { action, computed, makeObservable, observable, set } from 'mobx';
 import { setReactionsPaused } from 'Lib/reactionScheduler';
 import * as I from 'Interface';
 import Storage from 'Lib/storage';
+import { applyAppearance } from '../plus/appearance'; // plus:
 
 interface Filter {
 	from: number;
@@ -1058,6 +1059,7 @@ class CommonStore {
 		const c = this.getThemeClass();
 
 		U.Dom.addBodyClass('theme', c);
+		applyAppearance(); // plus: paleta y tamaño de texto
 		Renderer.send('setBackground');
 	};
 

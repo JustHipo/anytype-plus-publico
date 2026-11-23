@@ -5,6 +5,7 @@ import * as I from 'Interface';
 import * as M from 'Model';
 import Storage from 'Lib/storage';
 import { focus } from 'Lib/focus';
+import { isMiniApp, replaceWithHtmlLive } from '../../../plus/htmlBlock'; // plus:
 
 const HEIGHT_ITEM = 32;
 const HEIGHT_SECTION = 42;
@@ -585,6 +586,12 @@ const MenuBlockAdd = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 							// Auto-open BlockRelation suggest menu
 							if ((param.type == I.BlockType.Relation) && !param.content.key) {
 								U.Dom.select('.info', element)?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+							};
+
+							// plus: `/html` termina en un único bloque «HTML en vivo» (código `html-vivo` dibujado como página)
+							if (isMiniApp(param)) {
+								replaceWithHtmlLive(rootId, newBlockId);
+								return;
 							};
 
 							// Auto-open BlockEmbed edit mode

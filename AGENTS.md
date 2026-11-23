@@ -1,3 +1,8 @@
+> **Anytype Plus (fork personal).** Antes de trabajar, lee `plus/README.md` y `plus/ARQUITECTURA.md`.
+> Regla de oro: seguimos en la red oficial de Anytype con la misma cuenta, así que no se toca heart y todo lo nuevo
+> se guarda con piezas que heart ya conoce (`plus/ARQUITECTURA.md`). Código propio en `plus/`, `src/ts/plus/` y
+> `src/scss/plus/`; los toques al código de Anytype se marcan con `// plus:`. Documentación en español.
+
 
 # agents.md
 

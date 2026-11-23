@@ -34,6 +34,25 @@
 
 			html.isChart canvas { background: #fff; }
 			html.isKroki #root svg { max-width: 100%; height: auto !important; background: #fff; }
+			/* plus: el Mini App es HTML de documento: texto con tamaño normal y seleccionable */
+			html.isMiniApp #root { font-size: 16px; line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; }
+			html.isMiniApp, html.isMiniApp * { user-select: text; }
+			html.isMiniApp #root { display: flow-root; } /* plus: los márgenes de los hijos cuentan en el alto */
+			/* plus: variables de tema para el HTML (cambian con el tema de la app) */
+			html.isMiniApp {
+				--plus-bg: #ffffff; --plus-surface: #f6f6f5; --plus-text: #252525; --plus-muted: #6c6c6c;
+				--plus-border: #e3e3e3; --plus-accent: #2a7fd4; --plus-radius: 10px;
+			}
+			html.isMiniApp.dark {
+				--plus-bg: #171717; --plus-surface: #232323; --plus-text: #e0e0e0; --plus-muted: #9a9a9a;
+				--plus-border: #363636; --plus-accent: #5aa7f0;
+			}
+			html.isMiniApp body { background: var(--plus-bg); color: var(--plus-text); }
+			html.isMiniApp a { color: var(--plus-accent); }
+			html.isMiniApp .plus-card { background: var(--plus-surface); border: 1px solid var(--plus-border); border-radius: var(--plus-radius); padding: 16px 20px; }
+			html.isMiniApp .plus-card h2 { font-size: 20px; margin-bottom: 6px; }
+			html.isMiniApp .plus-card p + p { margin-top: 6px; }
+			html.isMiniApp .plus-card p { color: var(--plus-muted); font-size: 14px; }
 		</style>
 	</head>
 	<body>
@@ -87,6 +106,7 @@
 				let cachedHtml = '';
 				let height = 0;
 				let isMiniApp = false;
+				let isPlusLive = false; // plus: bloque «HTML en vivo»: el alto sigue al contenido, también hacia abajo
 				let blockId = '';
 				let player;
 				let html = '';
@@ -107,6 +127,7 @@
 						blockId = oe.data.blockId;
 						processor = oe.data.processor;
 						isMiniApp = true;
+						isPlusLive = !!oe.data.plusLive; // plus:
 
 						htmlEl.attr({ class: '' });
 						if (param.theme) {
@@ -116,6 +137,7 @@
 							htmlEl.addClass('allowIframeResize');
 						};
 						htmlEl.addClass(`align${oe.data.align}`);
+						htmlEl.addClass('isMiniApp'); // plus:
 
 						if (oe.data.allowIframeResize) {
 							if (window.__anytypeMiniAppResizeTimer__) {
@@ -241,6 +263,13 @@
 				win.on('resize', resize);
 
 				function resize () {
+					if (isPlusLive) {
+						// plus: alto real del contenido (no el del iframe), para poder achicarse
+						height = Math.ceil(root.get(0).scrollHeight);
+						window.parent.postMessage({ type: 'resize', height, blockId }, '*');
+						return;
+					};
+
 					const h = useRootHeight ? root.height() : document.documentElement.scrollHeight;
 					height = isMiniApp ? Math.max(height, h) : h;
 					window.parent.postMessage({ type: 'resize', height, blockId }, '*');
@@ -375,6 +404,17 @@
 
 					const scriptNodes = Array.from(tmp.querySelectorAll('script'));
 					scriptNodes.forEach(s => s.parentNode && s.parentNode.removeChild(s));
+
+					// plus: los enlaces del Mini App los abre Anytype (objetos anytype:// dentro de la app, web afuera);
+					// delegado para que también sirva con enlaces creados por el JavaScript del HTML
+					root.off('click.plus').on('click.plus', 'a[href]', function (e) {
+						const url = $(this).attr('href') || '';
+						if (!url || url.startsWith('#') || url.startsWith('javascript:')) {
+							return;
+						};
+						e.preventDefault();
+						window.parent.postMessage({ type: 'openUrl', url, blockId }, '*');
+					});
 
 					// Move the non-script content into #root.
 					const rootEl = root.get(0);

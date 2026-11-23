@@ -5,6 +5,7 @@ import path from 'path';
 import Api from './api';
 import ConfigManager from './config';
 import UpdateManager from './update';
+import PlusUpdate from './plus/update'; // plus:
 import WindowManager from './window';
 import Util from './util';
 import { getSafeStorage } from './safeStorage';
@@ -110,7 +111,7 @@ class MenuManager {
 
 		const menuParam: Electron.MenuItemConstructorOptions[] = [
 			{
-				label: 'Anytype',
+				label: 'Anytype Plus', // plus:
 				submenu: [
 					{ label: Util.translate('electronMenuAbout'), click: () => Util.send(this.win, 'popup', 'about', {}, true) },
 
@@ -122,6 +123,9 @@ class MenuManager {
 
 					{ type: 'separator', visible: isAllowedUpdate },
 					{ label: Util.translate('electronMenuCheckUpdates'), click: () => Api.updateCheck(this.win), visible: isAllowedUpdate },
+
+					// plus: actualizaciones de Anytype Plus
+					...this.plusUpdateItems(),
 
 					Separator,
 
@@ -482,6 +486,29 @@ class MenuManager {
 		]));
 	};
 
+	// plus: menú de actualizaciones de Anytype Plus
+	plusUpdateItems (): Electron.MenuItemConstructorOptions[] {
+		PlusUpdate.onChange = () => { this.initMenu(); this.initTray(); };
+
+		if (!PlusUpdate.isEnabled()) {
+			return [];
+		};
+
+		const es = /^es/i.test(String((ConfigManager.config as any).interfaceLang || app.getLocale() || ''));
+		const items: Electron.MenuItemConstructorOptions[] = [
+			{ type: 'separator' },
+			{ label: es ? 'Buscar actualizaciones de Anytype Plus…' : 'Check for Anytype Plus updates…', click: () => { this.winShow(); PlusUpdate.check(true); } },
+		];
+
+		if (PlusUpdate.isConnected()) {
+			items.push({ label: es ? 'Desconectar GitHub' : 'Disconnect GitHub', click: () => PlusUpdate.disconnect(true) });
+		} else {
+			items.push({ label: es ? 'Conectar GitHub para actualizaciones…' : 'Connect GitHub for updates…', click: () => { this.winShow(); PlusUpdate.connect(); } });
+		};
+
+		return items;
+	};
+
 	initTray (): void {
 		const { config } = ConfigManager;
 
@@ -498,7 +525,7 @@ class MenuManager {
 		const icon = this.getTrayIcon();
 
 		this.tray = new Tray(this.toTrayImage(icon));
-		this.tray.setToolTip('Anytype');
+		this.tray.setToolTip('Anytype Plus'); // plus:
 		this.tray.setContextMenu(Menu.buildFromTemplate([
 			{ label: Util.translate('electronMenuOpenApp'), click: () => this.winShow() },
 			{ label: Util.translate('electronMenuSearch'), accelerator: this.getAccelerator('globalSearch'), click: () => this.onGlobalSearch() },
@@ -510,6 +537,7 @@ class MenuManager {
 			Separator,
 
 			{ label: Util.translate('electronMenuCheckUpdates'), click: () => { this.winShow(); Api.updateCheck(this.win); }, visible: isAllowedUpdate },
+			...this.plusUpdateItems(), // plus:
 			{ label: Util.translate('commonSettings'), submenu: this.menuSettings() },
 
 			Separator,

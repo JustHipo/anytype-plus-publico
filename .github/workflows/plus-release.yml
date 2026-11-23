@@ -1,0 +1,174 @@
+# plus: instaladores y actualizaciones de Anytype Plus para macOS (Apple Silicon e Intel) y Windows.
+# Corre al subir un tag `plus-vX.Y.Z` (la versión de la app pasa a ser X.Y.Z) o a mano desde la pestaña Actions.
+# Las notas del Release son el mensaje del tag: es lo que la app muestra como novedades.
+# macOS se firma y notariza si existen los secretos MAC_CERT_TEXT, MAC_CERT_PASS, APPLEID, APPLEIDPASS y
+# APPLETEAM; sin ellos sale sin firma. Windows sale sin firma (aviso de SmartScreen).
+# Los instaladores quedan en un Release del repo privado: solo los ve y los descarga quien tiene acceso.
+name: Anytype Plus release
+
+on:
+  push:
+    tags:
+      - 'plus-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: plus-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-15
+          - windows-2025
+
+    env:
+      USE_HARD_LINKS: 'false'
+      HAS_MAC_CERT: ${{ secrets.MAC_CERT_TEXT != '' }}
+      HAS_NOTARIZE: ${{ secrets.APPLEID != '' }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Version and release notes from the tag
+        if: ${{ startsWith(github.ref, 'refs/tags/plus-v') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#plus-v}"
+          node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));p.version=process.argv[1];fs.writeFileSync('package.json',JSON.stringify(p,null,'\t')+'\n')" "$VERSION"
+          git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
+          git for-each-ref "refs/tags/${GITHUB_REF_NAME}" --format='%(contents)' | sed '/-----BEGIN PGP/,$d' > release-notes.md
+          echo "Versión: $VERSION"; cat release-notes.md
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Update locale
+        run: bun run update:locale
+
+      - name: Download heart (Windows)
+        if: ${{ startsWith(matrix.os, 'windows-') }}
+        shell: bash
+        run: ./update-ci.sh --user="x-access-token" --token="${{ github.token }}" --os="${{ matrix.os }}" --middleware-version="$(cat middleware.version)"
+
+      - name: Download heart (macOS arm and amd)
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        shell: bash
+        run: |
+          ./update-ci.sh --user="x-access-token" --token="${{ github.token }}" --os="${{ matrix.os }}" --middleware-version="$(cat middleware.version)" --arch="arm"
+          ./update-ci.sh --user="x-access-token" --token="${{ github.token }}" --os="${{ matrix.os }}" --middleware-version="$(cat middleware.version)" --arch="amd"
+
+      - name: Install protoc
+        shell: bash
+        env:
+          PROTOC_VERSION: '23.4'
+        run: |
+          set -euo pipefail
+          case "${{ runner.os }}" in
+            macOS)   ZIP="protoc-${PROTOC_VERSION}-osx-universal_binary.zip" ;;
+            Windows) ZIP="protoc-${PROTOC_VERSION}-win64.zip" ;;
+          esac
+          DEST="$HOME/protoc"
+          mkdir -p "$DEST"
+          curl -fsSL -o "$DEST/protoc.zip" "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/${ZIP}"
+          unzip -o "$DEST/protoc.zip" -d "$DEST"
+          echo "$DEST/bin" >> "$GITHUB_PATH"
+
+      - name: Generate protobuf bindings
+        run: bash scripts/generate-protos.sh --from-dist
+
+      - name: Build native messaging host (Windows)
+        if: ${{ startsWith(matrix.os, 'windows-') }}
+        run: bun run build:nmh-win
+        env:
+          CGO_ENABLED: 0
+
+      - name: Build native messaging host (macOS)
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        run: bun run build:nmh
+        env:
+          CGO_ENABLED: 0
+
+      - name: Build frontend
+        run: bun run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Package macOS (signed and notarized)
+        if: ${{ startsWith(matrix.os, 'macos-') && env.HAS_MAC_CERT == 'true' }}
+        run: bunx electron-builder --macos --arm64 --x64 --publish never
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_TEXT }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASS }}
+          APPLEID: ${{ secrets.APPLEID }}
+          APPLEIDPASS: ${{ secrets.APPLEIDPASS }}
+          APPLETEAM: ${{ secrets.APPLETEAM }}
+          ELECTRON_SKIP_NOTARIZE: ${{ env.HAS_NOTARIZE != 'true' && '1' || '' }}
+
+      - name: Package macOS (unsigned)
+        if: ${{ startsWith(matrix.os, 'macos-') && env.HAS_MAC_CERT != 'true' }}
+        run: bunx electron-builder --macos --arm64 --x64 --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          ELECTRON_SKIP_NOTARIZE: '1'
+
+      - name: Package Windows
+        if: ${{ startsWith(matrix.os, 'windows-') }}
+        run: bunx electron-builder --windows --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          ELECTRON_SKIP_NOTARIZE: '1'
+
+      - name: Upload to the release of this tag
+        if: ${{ startsWith(github.ref, 'refs/tags/plus-v') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Anytype Plus ${{ github.ref_name }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: false
+          files: |
+            dist/*.dmg
+            dist/*.zip
+            dist/*Setup*.exe
+            dist/*.blockmap
+            dist/latest*.yml
+
+      - name: Keep installers (manual runs)
+        if: ${{ !startsWith(github.ref, 'refs/tags/plus-v') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: anytype-plus-${{ matrix.os }}
+          path: |
+            dist/*.dmg
+            dist/*Setup*.exe
+          if-no-files-found: warn
+          retention-days: 14

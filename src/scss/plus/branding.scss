@@ -1,0 +1,15 @@
+// plus: marca de Anytype Plus. El logo de Anytype queda igual y se le suma «plus» al lado.
+
+.header.authIndex,
+.header.authLogout {
+	.logo { position: relative; overflow: visible; }
+	.logo::after {
+		content: 'plus'; position: absolute; left: calc(100% + 5px); top: 50%; transform: translateY(-52%);
+		font-size: 15px; line-height: 1; font-weight: 600; letter-spacing: -0.2px; color: var(--color-text-primary);
+	}
+}
+
+.recoveryLogo::after {
+	content: 'plus'; position: absolute; left: calc(50% + 40px); top: 50%; transform: translateY(-52%);
+	font-size: 15px; line-height: 1; font-weight: 600; color: var(--color-text-primary);
+}

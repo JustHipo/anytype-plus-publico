@@ -19,7 +19,7 @@ import { powerState, PowerSnapshot } from './lib/powerState';
 import DownloadManager, { DownloadRequest } from './download';
 import { AppWindow, TabView, TabData, CreateTabOptions, AppConfig, Bounds } from './types';
 
-const KEYTAR_SERVICE = 'Anytype';
+const KEYTAR_SERVICE = 'Anytype Plus'; // plus: llavero propio, separado del Anytype oficial
 
 /**
  * Local-link pairing prompts. Main owns them because Event.Account.LinkApprovalRequest reaches every

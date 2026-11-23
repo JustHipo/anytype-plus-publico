@@ -8,6 +8,11 @@ import Storage from 'Lib/storage';
 import { focus } from 'Lib/focus';
 import { presence } from 'Lib/presence';
 import { virtualBlock } from 'Lib/virtualBlock';
+import PlusHtmlLive, { isHtmlLive, PLUS_HTML_LANG, resetHtmlLiveHeight } from '../../plus/htmlLive'; // plus:
+import PlusHtmlNative from '../../plus/htmlNative'; // plus:
+import { hasExecutableCode } from '../../plus/htmlParse'; // plus:
+import { t as plusText } from '../../plus/text'; // plus:
+import { isHtmlPageBlock } from '../../plus/htmlPage'; // plus:
 
 // Prism language plugins expect `Prism` on the global scope
 (window as any).Prism = Prism;
@@ -67,6 +72,9 @@ const BlockText = forwardRef<I.BlockRef, Props>((props, ref) => {
 	const checkRtl = isRtlFromText || fields.isRtlDetected;
 	const nodeRef = useRef(null);
 	const langRef = useRef(null);
+	const plusHtml = isHtmlLive(block); // plus: bloque de código «HTML en vivo»
+	const [ plusShowCode, setPlusShowCode ] = useState(false); // plus:
+	const plusPage = plusHtml && isHtmlPageBlock(rootId, block); // plus: HTML principal de una «Página HTML»
 	const editableRef = useRef(null);
 	const textRef = useRef('');
 	const marksRef = useRef<I.Mark[]>(marks || []);
@@ -271,7 +279,7 @@ const BlockText = forwardRef<I.BlockRef, Props>((props, ref) => {
 			html = Mark.stripZws(html);
 
 			html = grammar ? Prism.highlight(html, grammar, lang) : Prism.util.encode(html) as string;
-			langRef.current?.setValue(lang);
+			langRef.current?.setValue(plusHtml ? PLUS_HTML_LANG : lang); // plus:
 		} else {
 			if (!keyboard.isComposition) {
 				const parsed = Mark.fromUnicode(html, marksRef.current, false);
@@ -1879,6 +1887,24 @@ const BlockText = forwardRef<I.BlockRef, Props>((props, ref) => {
 					/>
 
 					<div className="buttons">
+						{plusHtml ? (
+							<div className="btn plusToggle" title={plusPage ? (plusShowCode ? plusText('viewPage') : plusText('editPage')) : ''} onClick={() => setPlusShowCode(!plusShowCode)}>
+								<Icon name="menu/action/wrap" className="codeWrap" />
+								<div className="txt">
+									{plusPage
+										? (plusShowCode ? plusText('viewPage') : plusText('editPage'))
+										: (plusShowCode ? plusText('hideCode') : plusText('showCode'))}
+								</div>
+							</div>
+						) : ''}
+
+						{plusHtml && !readonly && (Number(fields.plusHeight) > 0) ? (
+							<div className="btn" onClick={() => resetHtmlLiveHeight(rootId, block)}>
+								<Icon name="menu/action/wrap" className="codeWrap" />
+								<div className="txt">{plusText('autoHeight')}</div>
+							</div>
+						) : ''}
+
 						<div className="btn" onClick={onToggleWrap}>
 							<Icon name="menu/action/wrap" className="codeWrap" />
 							<div className="txt">{fields.isUnwrapped ? translate('blockTextWrap') : translate('blockTextUnwrap')}</div>
@@ -1923,6 +1949,18 @@ const BlockText = forwardRef<I.BlockRef, Props>((props, ref) => {
 		cn.push('withPresence');
 	};
 
+	// plus: el HTML en vivo esconde el código salvo que se pida verlo
+	if (plusHtml) {
+		cn.push('isPlusHtmlLive');
+		if (plusShowCode) {
+			cn.push('plusShowCode');
+		};
+		// En una Página HTML, el modo vista ocupa la página completa; al editar vuelve la página normal
+		if (plusPage && !plusShowCode) {
+			cn.push('isPlusPage');
+		};
+	};
+
 	return (
 		<div
 			ref={nodeRef}
@@ -1960,6 +1998,12 @@ const BlockText = forwardRef<I.BlockRef, Props>((props, ref) => {
 				onCompositionEnd={onCompositionEnd}
 				onBeforeInput={onBeforeInput}
 			/>
+
+			{plusHtml ? (
+				hasExecutableCode(text)
+					? <PlusHtmlLive rootId={rootId} block={block} html={text} readonly={readonly} />
+					: <PlusHtmlNative rootId={rootId} block={block} html={text} readonly={readonly} isPopup={props.isPopup} />
+			) : ''}
 		</div>
 	);
 

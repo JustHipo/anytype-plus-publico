@@ -1,0 +1,67 @@
+// plus: bloque de código «HTML en vivo». En modo vista se oculta el código y se ve el HTML;
+// «Ver código» muestra el código arriba y el HTML sigue abajo como vista previa.
+
+.block.blockText.textCode > .wrapContent > .selectionTarget > .dropTarget > .flex.isPlusHtmlLive {
+	flex-direction: column; align-items: stretch;
+
+	// Solo el código de este bloque: no el texto de un documento incrustado dentro del HTML
+	#value:not(.plusEmbed #value) { display: none; }
+	&.plusShowCode #value { display: block; }
+
+	.plusHtmlLive { position: relative; width: 100%; padding: 0px 16px 16px 16px; }
+	.plusHtmlLive iframe { display: block; width: 100%; border: 0px; border-radius: 6px; background: transparent; }
+	.plusHtmlLive.isDragging iframe { pointer-events: none; }
+
+	// Manija para cambiar el alto: sin límite hacia arriba ni hacia abajo
+	.plusResize {
+		position: absolute; left: 50%; bottom: 4px; width: 48px; height: 8px; margin-left: -24px; border-radius: 4px;
+		cursor: ns-resize; background: var(--color-shape-secondary); opacity: 0; transition: opacity 0.15s;
+	}
+	.plusHtmlLive:hover .plusResize, .plusHtmlLive.isDragging .plusResize, .plusHtmlLive.isFixed .plusResize,
+	.plusHtmlNative:hover > .plusResize, .plusHtmlNative.isDragging > .plusResize, .plusHtmlNative.isFixed > .plusResize { opacity: 1; }
+}
+
+// Modo nativo: el HTML vive dentro de la página (shadow DOM) y las piezas nativas se proyectan en él.
+.block.blockText.textCode > .wrapContent > .selectionTarget > .dropTarget > .flex.isPlusHtmlLive {
+	// contain: lo que dibuje el HTML (incluido position: fixed) no puede salir de su bloque ni tapar la app
+	.plusHtmlNative { position: relative; width: 100%; padding: 0px 16px 16px 16px; contain: layout paint; }
+	.plusHtmlNative.isFixed .plusScroll { overflow: auto; }
+	.plusHtmlNative .plusMessage + .plusScroll { display: none; }
+	.plusHost { display: block; }
+
+	.plusSlot { font-family: 'Inter'; }
+
+	// Vistas nativas: Anytype calcula su ancho con el del bloque o el de la página. Dentro del HTML mandan
+	// el ancho del lugar donde el HTML las puso; si las columnas no caben, la vista tiene scroll horizontal.
+	.plusView { min-width: 0; max-width: 100%; }
+	.plusView .block.blockDataview { padding: 0px; margin: 0px; width: 100%; }
+	// Sin la columna de la manija de bloque (48px a la izquierda): dentro del HTML la vista se alinea con lo demás
+	.plusView .block.blockDataview > .wrapMenu { display: none; }
+	.plusView .block.blockDataview > .wrapContent { width: 100%; }
+	// El ancho del contenedor con scroll lo deja Anytype (el natural de su lugar); aquí solo se ata el contenido
+	.plusView .scroll { max-width: 100%; overflow-x: auto; }
+	// Anytype oculta la barra de scroll de sus vistas y usa una propia que solo funciona directamente en la
+	// página. Dentro del HTML se muestra una barra normal, visible y arrastrable, cuando el contenido no cabe.
+	.plusView .scroll::-webkit-scrollbar,
+	.plusHtmlNative.isFixed .plusScroll::-webkit-scrollbar { display: block !important; width: 10px; height: 10px; }
+	.plusView .scroll::-webkit-scrollbar-track,
+	.plusHtmlNative.isFixed .plusScroll::-webkit-scrollbar-track { background: transparent; }
+	.plusView .scroll::-webkit-scrollbar-thumb,
+	.plusHtmlNative.isFixed .plusScroll::-webkit-scrollbar-thumb {
+		background: var(--color-shape-highlight-dark); border-radius: 5px; border: 2px solid transparent; background-clip: padding-box;
+	}
+	.plusView .scroll::-webkit-scrollbar-thumb:hover,
+	.plusHtmlNative.isFixed .plusScroll::-webkit-scrollbar-thumb:hover { background-color: var(--color-control-active); }
+	.plusView .scroll { padding-bottom: 6px; }
+	.plusView .scroll > .scrollWrap { width: max-content !important; min-width: 100% !important; padding-left: 0px !important; padding-right: 0px !important; }
+	.plusMessage { padding: 12px 16px; border-radius: 8px; color: var(--color-text-secondary); background: var(--color-shape-highlight-medium); @include text-common; }
+	.plusLoading { position: relative; height: 80px; }
+
+	.plusObject {
+		display: inline-flex; align-items: center; gap: 0px 6px; padding: 1px 6px 1px 4px; border-radius: 6px; cursor: pointer;
+		vertical-align: middle; @include text-common; transition: background 0.15s;
+	}
+	.plusObject:hover { background: var(--color-shape-highlight-medium); }
+	.plusObject.isMissing { color: var(--color-text-tertiary); cursor: default; }
+	.plusObject .name { @include text-overflow-nw; }
+}

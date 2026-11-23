@@ -8,6 +8,7 @@ class UtilPrism {
 	constructor () {
 		this.map = this.getMap();
 		this.aliasMap = this.getAliasMap();
+		this.aliasMap['html-vivo'] = 'markup'; // plus: «HTML en vivo» se resalta como HTML
 	};
 
 	/**

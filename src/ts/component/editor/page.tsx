@@ -13,6 +13,7 @@ import { virtualBlock } from 'Lib/virtualBlock';
 import { useScrollRestore } from 'Hook';
 import { computeRestoreScrollTop } from 'Lib/util/scrollAnchor';
 import { getTopLevelIds, getIndentTargetId } from 'Lib/util/blockSelection';
+import { usePlusPageStyle } from '../../plus/appearance'; // plus:
 
 interface Props extends I.PageComponent {
 	onOpen?(): void;
@@ -26,6 +27,7 @@ const EditorPage = forwardRef<I.BlockRef, Props>((props, ref) => {
 	const { rootId, isPopup, onOpen } = props;
 	const root = S.Block.getLeaf(rootId, rootId);
 	const nodeRef = useRef(null);
+	usePlusPageStyle(rootId, nodeRef); // plus: fuente y tamaño de la página
 	const tocRef = useRef(null);
 	const headerRef = useRef(null);
 	const controlsRef = useRef(null);

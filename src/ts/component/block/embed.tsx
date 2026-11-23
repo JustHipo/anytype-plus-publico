@@ -92,10 +92,16 @@ const BlockEmbed = forwardRef<I.BlockRef, I.BlockComponent>((props, ref) => {
 			const codeSiblings = S.Block.getChildren(rootId, parent.id, (b: I.Block) => {
 				return b && (b.id !== block.id) && b.isTextCode();
 			});
-			const htmlBlock = codeSiblings.find((b: any) => {
+			const isHtml = (b: any) => {
 				const lang = String(b.fields?.lang || '').toLowerCase();
 				return (lang === 'html') || (lang === 'markup');
-			});
+			};
+			// plus: con varios HTML en la misma página, cada Mini App usa el bloque `html` más cercano por arriba
+			const siblingIds = parent.childrenIds || [];
+			const ownIndex = siblingIds.indexOf(block.id);
+			const nearestAbove = codeSiblings.filter((b: any) => isHtml(b) && (siblingIds.indexOf(b.id) < ownIndex))
+				.sort((a: any, b: any) => siblingIds.indexOf(b.id) - siblingIds.indexOf(a.id))[0];
+			const htmlBlock = nearestAbove || codeSiblings.find(isHtml);
 			const jsonBlock = codeSiblings.find((b: any) => {
 				return String(b.fields?.lang || '').toLowerCase() === 'json';
 			});

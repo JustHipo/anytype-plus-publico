@@ -1,4 +1,5 @@
 import raf from 'raf';
+import { t as plusText } from '../../plus/text'; // plus:
 import { observable } from 'mobx';
 import { setRange } from 'selection-ranges';
 import Locale from 'dist/lib/json/locale.json';
@@ -180,12 +181,12 @@ class UtilMenu {
 			{ id: I.EmbedProcessor.AppleMusic, name: 'Apple Music' },
 			{ id: I.EmbedProcessor.Bandcamp, name: 'Bandcamp' },
 			{ id: I.EmbedProcessor.Reddit, name: 'Reddit' },
+			{ id: I.EmbedProcessor.AnytypeMiniApp, name: plusText('menuHtml') }, // plus: siempre visible; se convierte en un bloque «HTML en vivo»
 		];
 
 		if (config.experimental) {
 			ret = ret.concat([
 				{ id: I.EmbedProcessor.Image, name: translate('blockEmbedExternalImage') },
-				{ id: I.EmbedProcessor.AnytypeMiniApp, name: 'Anytype Mini App' },
 			]);
 		};
 
@@ -1269,7 +1270,7 @@ class UtilMenu {
 	};
 
 	codeLangOptions (): I.Option[] {
-		return [ { id: 'plain', name: translate('blockTextPlain') } ].concat(U.Prism.getTitles());
+		return [ { id: 'plain', name: translate('blockTextPlain') }, { id: 'html-vivo', name: plusText('langName') } ].concat(U.Prism.getTitles()); // plus:
 	};
 
 	getCommentAddSections (): any[] {

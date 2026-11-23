@@ -1,6 +1,9 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { Title, Label, Select, Switch, Icon } from 'Component';
 import * as I from 'Interface';
+import { getPalette, setPalette, getTextScale, setTextScale, paletteOptions, scaleOptions } from '../../../../plus/appearance'; // plus:
+import { t as plusText } from '../../../../plus/text'; // plus:
+import PlusChangeAlertsSettings from '../../../../plus/changeAlertsSettings'; // plus:
 
 enum ChatKey {
 	Enter 	 = 'enter',
@@ -15,6 +18,8 @@ const PageMainSettingsPersonal = forwardRef<I.PageRef, I.PageSettingsComponent>(
 	const { networkConfig } = S.Auth;
 	const { preferYamux } = networkConfig;
 	const cmd = keyboard.cmdSymbol();
+	const [ plusPalette, setPlusPalette ] = useState(getPalette()); // plus:
+	const [ plusScale, setPlusScale ] = useState(String(getTextScale())); // plus:
 
 	const onHardwareAccelerationChange = (v: boolean) => {
 		S.Popup.open('confirm', {
@@ -109,6 +114,38 @@ const PageMainSettingsPersonal = forwardRef<I.PageRef, I.PageSettingsComponent>(
 			</div>
 
 			<div className="actionItems">
+				{/* plus: paleta y tamaño de texto */}
+				<div className="item">
+					<Label text={plusText('palette')} />
+					<Select
+						id="plusPalette"
+						value={plusPalette}
+						options={paletteOptions()}
+						onChange={(v: string) => {
+							setPalette(v);
+							setPlusPalette(v);
+						}}
+						arrowClassName="black"
+						menuParam={{ horizontal: I.MenuDirection.Right }}
+					/>
+				</div>
+
+				<div className="item">
+					<Label text={plusText('textSize')} />
+					<Select
+						id="plusTextScale"
+						value={plusScale}
+						options={scaleOptions()}
+						onChange={(v: string) => {
+							setTextScale(Number(v));
+							setPlusScale(v);
+						}}
+						arrowClassName="black"
+						menuParam={{ horizontal: I.MenuDirection.Right }}
+					/>
+				</div>
+				{/* plus: fin */}
+
 				<div className="item">
 					<Label text={translate('popupSettingsPersonalNotificationSound')} />
 
@@ -292,6 +329,8 @@ const PageMainSettingsPersonal = forwardRef<I.PageRef, I.PageSettingsComponent>(
 					/>
 				</div>
 			</div>
+
+			<PlusChangeAlertsSettings /> {/* plus: avisos de cambios */}
 
 			<Label className="section" text={translate('popupSettingsPersonalSectionAdvanced')} />
 

@@ -9,6 +9,7 @@ import { focus } from 'Lib/focus';
 import { virtualBlock } from 'Lib/virtualBlock';
 import { membership } from 'Lib/membership';
 import { powerState } from 'Lib/powerState';
+import { startChangeAlerts } from '../../plus/changeAlerts'; // plus:
 
 const TYPE_KEYS = {
 	default: [
@@ -539,6 +540,8 @@ class UtilData {
 				Storage.clearDeletedSpaces(false);
 				Storage.clearDeletedSpaces(true);
 			};
+
+			startChangeAlerts(); // plus: avisos de cambios
 		});
 	};
 

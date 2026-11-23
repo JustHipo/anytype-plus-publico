@@ -1,5 +1,11 @@
 {
 	"name": "anytype",
+	"productName": "Anytype Plus",
+	"plusUpdate": {
+		"owner": "JustHipo",
+		"repo": "anytype-plus",
+		"clientId": ""
+	},
 	"version": "0.57.7",
 	"description": "Anytype",
 	"main": "electron.js",
@@ -137,6 +143,7 @@
 		"d3-force-cluster": "^0.1.2",
 		"date-fns": "^4.1.0",
 		"diff": "^5.2.0",
+		"docx-preview": "0.4.1",
 		"dompurify": "^3.4.15",
 		"electron-dl": "^3.5.2",
 		"electron-json-storage": "^4.6.0",
@@ -207,15 +214,15 @@
 		"beforeBuild": "./electron/hook/beforebuild.js",
 		"afterSign": "./electron/hook/aftersign.js",
 		"afterPack": "./electron/hook/afterpack.js",
-		"appId": "com.anytype.anytype",
+		"appId": "com.anytypeplus.desktop",
 		"compression": "normal",
-		"productName": "Anytype",
+		"productName": "Anytype Plus",
 		"protocols": [
 			{
-				"name": "Anytype",
+				"name": "Anytype Plus",
 				"role": "Editor",
 				"schemes": [
-					"anytype"
+					"anytype-plus"
 				]
 			}
 		],
@@ -274,7 +281,7 @@
 			"dist/index.html",
 			"dist/tabs.html",
 			"dist/embed/**/*",
-			"dist/linkApproval/**/*",
+			"dist/challenge/**/*",
 			"dist/lib/**/*",
 			"!dist/lib/pb/**/*",
 			"!dist/lib/pkg/**/*",
@@ -444,16 +451,8 @@
 				"to": "node_modules/end-of-stream"
 			},
 			{
-				"from": "node_modules/error-ex",
-				"to": "node_modules/error-ex"
-			},
-			{
 				"from": "node_modules/escape-goat",
 				"to": "node_modules/escape-goat"
-			},
-			{
-				"from": "node_modules/execa",
-				"to": "node_modules/execa"
 			},
 			{
 				"from": "node_modules/expand-template",
@@ -472,10 +471,6 @@
 				"to": "node_modules/file-type"
 			},
 			{
-				"from": "node_modules/find-up",
-				"to": "node_modules/find-up"
-			},
-			{
 				"from": "node_modules/foreground-child",
 				"to": "node_modules/foreground-child"
 			},
@@ -492,14 +487,6 @@
 				"to": "node_modules/fs.realpath"
 			},
 			{
-				"from": "node_modules/function-bind",
-				"to": "node_modules/function-bind"
-			},
-			{
-				"from": "node_modules/get-stream",
-				"to": "node_modules/get-stream"
-			},
-			{
 				"from": "node_modules/github-from-package",
 				"to": "node_modules/github-from-package"
 			},
@@ -514,18 +501,6 @@
 			{
 				"from": "node_modules/has-flag",
 				"to": "node_modules/has-flag"
-			},
-			{
-				"from": "node_modules/hasown",
-				"to": "node_modules/hasown"
-			},
-			{
-				"from": "node_modules/hosted-git-info",
-				"to": "node_modules/hosted-git-info"
-			},
-			{
-				"from": "node_modules/human-signals",
-				"to": "node_modules/human-signals"
 			},
 			{
 				"from": "node_modules/ieee754",
@@ -556,24 +531,12 @@
 				"to": "node_modules/ini"
 			},
 			{
-				"from": "node_modules/is-arrayish",
-				"to": "node_modules/is-arrayish"
-			},
-			{
-				"from": "node_modules/is-core-module",
-				"to": "node_modules/is-core-module"
-			},
-			{
 				"from": "node_modules/is-fullwidth-code-point",
 				"to": "node_modules/is-fullwidth-code-point"
 			},
 			{
 				"from": "node_modules/is-plain-obj",
 				"to": "node_modules/is-plain-obj"
-			},
-			{
-				"from": "node_modules/is-stream",
-				"to": "node_modules/is-stream"
 			},
 			{
 				"from": "node_modules/isarray",
@@ -590,10 +553,6 @@
 			{
 				"from": "node_modules/js-yaml",
 				"to": "node_modules/js-yaml"
-			},
-			{
-				"from": "node_modules/json-parse-better-errors",
-				"to": "node_modules/json-parse-better-errors"
 			},
 			{
 				"from": "node_modules/jsonfile",
@@ -616,14 +575,6 @@
 				"to": "node_modules/lie"
 			},
 			{
-				"from": "node_modules/load-json-file",
-				"to": "node_modules/load-json-file"
-			},
-			{
-				"from": "node_modules/locate-path",
-				"to": "node_modules/locate-path"
-			},
-			{
 				"from": "node_modules/lockfile",
 				"to": "node_modules/lockfile"
 			},
@@ -644,20 +595,12 @@
 				"to": "node_modules/lru-cache"
 			},
 			{
-				"from": "node_modules/merge-stream",
-				"to": "node_modules/merge-stream"
-			},
-			{
 				"from": "node_modules/mime-db",
 				"to": "node_modules/mime-db"
 			},
 			{
 				"from": "node_modules/mime-types",
 				"to": "node_modules/mime-types"
-			},
-			{
-				"from": "node_modules/mimic-fn",
-				"to": "node_modules/mimic-fn"
 			},
 			{
 				"from": "node_modules/mimic-response",
@@ -708,28 +651,8 @@
 				"to": "node_modules/node-addon-api"
 			},
 			{
-				"from": "node_modules/normalize-package-data",
-				"to": "node_modules/normalize-package-data"
-			},
-			{
-				"from": "node_modules/npm-run-path",
-				"to": "node_modules/npm-run-path"
-			},
-			{
 				"from": "node_modules/once",
 				"to": "node_modules/once"
-			},
-			{
-				"from": "node_modules/onetime",
-				"to": "node_modules/onetime"
-			},
-			{
-				"from": "node_modules/p-limit",
-				"to": "node_modules/p-limit"
-			},
-			{
-				"from": "node_modules/p-locate",
-				"to": "node_modules/p-locate"
 			},
 			{
 				"from": "node_modules/package-json-from-dist",
@@ -738,10 +661,6 @@
 			{
 				"from": "node_modules/pako",
 				"to": "node_modules/pako"
-			},
-			{
-				"from": "node_modules/parse-json",
-				"to": "node_modules/parse-json"
 			},
 			{
 				"from": "node_modules/path-exists",
@@ -756,16 +675,8 @@
 				"to": "node_modules/path-key"
 			},
 			{
-				"from": "node_modules/path-parse",
-				"to": "node_modules/path-parse"
-			},
-			{
 				"from": "node_modules/path-scurry",
 				"to": "node_modules/path-scurry"
-			},
-			{
-				"from": "node_modules/path-type",
-				"to": "node_modules/path-type"
 			},
 			{
 				"from": "node_modules/prebuild-install",
@@ -788,20 +699,12 @@
 				"to": "node_modules/rc"
 			},
 			{
-				"from": "node_modules/read-pkg",
-				"to": "node_modules/read-pkg"
-			},
-			{
 				"from": "node_modules/readable-stream",
 				"to": "node_modules/readable-stream"
 			},
 			{
 				"from": "node_modules/regedit",
 				"to": "node_modules/regedit"
-			},
-			{
-				"from": "node_modules/resolve",
-				"to": "node_modules/resolve"
 			},
 			{
 				"from": "node_modules/rimraf",
@@ -856,22 +759,6 @@
 				"to": "node_modules/sort-keys-length"
 			},
 			{
-				"from": "node_modules/spdx-correct",
-				"to": "node_modules/spdx-correct"
-			},
-			{
-				"from": "node_modules/spdx-exceptions",
-				"to": "node_modules/spdx-exceptions"
-			},
-			{
-				"from": "node_modules/spdx-expression-parse",
-				"to": "node_modules/spdx-expression-parse"
-			},
-			{
-				"from": "node_modules/spdx-license-ids",
-				"to": "node_modules/spdx-license-ids"
-			},
-			{
 				"from": "node_modules/stream-slicer",
 				"to": "node_modules/stream-slicer"
 			},
@@ -896,18 +783,6 @@
 				"to": "node_modules/strip-ansi-cjs"
 			},
 			{
-				"from": "node_modules/strip-bom",
-				"to": "node_modules/strip-bom"
-			},
-			{
-				"from": "node_modules/strip-final-newline",
-				"to": "node_modules/strip-final-newline"
-			},
-			{
-				"from": "node_modules/strip-indent",
-				"to": "node_modules/strip-indent"
-			},
-			{
 				"from": "node_modules/strip-json-comments",
 				"to": "node_modules/strip-json-comments"
 			},
@@ -918,10 +793,6 @@
 			{
 				"from": "node_modules/supports-color",
 				"to": "node_modules/supports-color"
-			},
-			{
-				"from": "node_modules/supports-preserve-symlinks-flag",
-				"to": "node_modules/supports-preserve-symlinks-flag"
 			},
 			{
 				"from": "node_modules/tar-fs",
@@ -972,10 +843,6 @@
 				"to": "node_modules/util-deprecate"
 			},
 			{
-				"from": "node_modules/validate-npm-package-license",
-				"to": "node_modules/validate-npm-package-license"
-			},
-			{
 				"from": "node_modules/which",
 				"to": "node_modules/which"
 			},
@@ -1002,10 +869,6 @@
 			{
 				"from": "node_modules/yallist",
 				"to": "node_modules/yallist"
-			},
-			{
-				"from": "node_modules/yocto-queue",
-				"to": "node_modules/yocto-queue"
 			}
 		],
 		"dmg": {
@@ -1025,13 +888,15 @@
 					"arm64"
 				]
 			},
-			"identity": "J3NXTX3T5S",
 			"category": "public.app-category.productivity",
-			"artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+			"artifactName": "Anytype-Plus-${version}-${os}-${arch}.${ext}",
 			"publish": [
 				{
-					"provider": "generic",
-					"url": "https://anytype-release.fra1.digitaloceanspaces.com"
+					"provider": "github",
+					"owner": "JustHipo",
+					"repo": "anytype-plus",
+					"private": true,
+					"releaseType": "release"
 				}
 			],
 			"signIgnore": [
@@ -1043,16 +908,19 @@
 				".*\\.icns$"
 			]
 		},
+		"nsis": {
+			"artifactName": "Anytype-Plus-Setup-${version}.${ext}"
+		},
 		"win": {
-			"signtoolOptions": {
-				"sign": "./electron/hook/sign.js"
-			},
 			"target": "nsis",
 			"icon": "electron/img/icons/256x256.ico",
 			"publish": [
 				{
-					"provider": "generic",
-					"url": "https://anytype-release.fra1.digitaloceanspaces.com"
+					"provider": "github",
+					"owner": "JustHipo",
+					"repo": "anytype-plus",
+					"private": true,
+					"releaseType": "release"
 				}
 			]
 		},
@@ -1072,8 +940,11 @@
 			"description": "Anytype",
 			"publish": [
 				{
-					"provider": "generic",
-					"url": "https://anytype-release.fra1.digitaloceanspaces.com"
+					"provider": "github",
+					"owner": "JustHipo",
+					"repo": "anytype-plus",
+					"private": true,
+					"releaseType": "release"
 				}
 			],
 			"desktop": {

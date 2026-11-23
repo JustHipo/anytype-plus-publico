@@ -20,6 +20,7 @@ import { installExtension } from '@tomjs/electron-devtools-installer';
 import Api from './api';
 import ConfigManager from './config';
 import UpdateManager from './update';
+import PlusUpdate from './plus/update'; // plus:
 import MenuManager from './menu';
 import WindowManager from './window';
 import Server from './server';
@@ -32,7 +33,7 @@ import Util from './util';
 import Cors from '../json/cors.json';
 import { AppWindow } from './types';
 
-const protocol = 'anytype';
+const protocol = 'anytype-plus'; // plus: esquema propio, para no quitarle anytype:// al Anytype oficial
 const binPath = fixPathForAsarUnpack(path.join(__dirname, 'dist', `anytypeHelper${is.windows ? '.exe' : ''}`));
 const store = getSafeStorage();
 registerChatStatus();
@@ -351,6 +352,7 @@ function createWindow () {
 
 	UpdateManager.setWindow(mainWindow);
 	UpdateManager.init();
+	PlusUpdate.init(mainWindow); // plus: actualizaciones desde el repo privado
 
 	MenuManager.setWindow(mainWindow);
 	MenuManager.initMenu();
@@ -358,7 +360,8 @@ function createWindow () {
 	MenuManager.initDock();
 	MenuManager.initGlobalShortcuts();
 
-	installNativeMessagingHost();
+	// plus: no instalar el puente del clipper; reescribe los manifiestos com.anytype.desktop del Anytype oficial
+	// installNativeMessagingHost();
 	Util.registerLinuxProtocolHandler();
 
 	// The approval window has no session and no Api id, so it reports the user's decision directly

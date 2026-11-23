@@ -1,0 +1,55 @@
+@import "~scss/_mixins";
+
+// plus: bandeja de cambios (página «Cambios») y su fila en la barra lateral. Solo variables de Anytype.
+
+.pageMainPlusChanges {
+	.wrapper.plusInbox { width: calc(100% - 96px); max-width: 960px; margin: 0px auto; padding: 52px 0px 80px 0px; user-select: none; display: flex; flex-direction: column; gap: 24px 0px; }
+	.wrapper.plusInbox {
+		.titleWrapper { display: flex; flex-direction: row; align-items: center; gap: 0px 16px; }
+		.titleWrapper {
+			.side.left { display: flex; flex-direction: row; align-items: center; gap: 0px 8px; flex-grow: 1; min-width: 0; }
+			.side.left {
+				.title { @include text-header1; font-weight: 700; }
+				.cnt {
+					@include text-common; display: flex; align-items: center; justify-content: center; height: 24px; min-width: 24px; padding: 0px 7px;
+					border-radius: 12px; font-weight: 500; color: var(--color-text-secondary); background-color: var(--color-shape-highlight-medium);
+				}
+			}
+			.side.right { display: flex; flex-direction: row; align-items: center; gap: 0px 8px; flex-shrink: 0; }
+			.button.disabled { opacity: 0.5; pointer-events: none; }
+		}
+
+		.plusInboxList { display: flex; flex-direction: column; gap: 1px; }
+		.plusInboxEmpty { @include text-common; color: var(--color-text-secondary); padding: 8px; }
+	}
+}
+
+.plusInboxItem { display: flex; flex-direction: row; align-items: center; gap: 0px 10px; padding: 7px 8px; border-radius: 6px; min-width: 0; }
+.plusInboxItem {
+	&:hover { background-color: var(--color-shape-highlight-medium); }
+
+	.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+	.name { @include text-common; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.info { @include text-small; flex: 1 1 auto; min-width: 0; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.arrow { flex-shrink: 0; transition: transform 0.15s; transform: rotate(-90deg); }
+}
+.plusInboxItem.isUnread {
+	.dot { background-color: var(--color-system-accent-100); }
+	.name { font-weight: 500; }
+}
+
+.plusInboxGroup.isUnread > .plusInboxItem.head {
+	.dot { background-color: var(--color-system-accent-100); }
+	.name { font-weight: 500; }
+}
+.plusInboxGroup.isOpen > .plusInboxItem.head {
+	.arrow { transform: rotate(0deg); }
+}
+.plusInboxGroup {
+	.children { display: flex; flex-direction: column; gap: 1px; margin-left: 19px; padding-left: 8px; border-left: 1px solid var(--color-shape-secondary); }
+}
+
+.widget.plusChangesWidget {
+	.head .side.left .clickable { display: flex; flex-direction: row; align-items: center; gap: 0px 6px; }
+	.head .side.right { display: flex; align-items: center; }
+}

@@ -3,6 +3,7 @@ import raf from 'raf';
 import { reaction } from 'mobx';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button, Icon, Widget, WidgetHome, ObjectName, Label, SpaceName, Sync } from 'Component';
+import PlusChangesWidget from '../../../plus/changesWidget'; // plus:
 import { I, C, M, S, U, J, keyboard, analytics, translate, scrollOnMove, Storage, Dataview, sidebar, Action } from 'Lib';
 import WidgetTreeSection from 'Component/widget/tree/section';
 
@@ -811,6 +812,7 @@ const SidebarPageWidget = forwardRef<{}, I.SidebarPageComponent>((props, ref) =>
 					getObject={id => getObject(spaceBlock, id)}
 				/>
 				<SpaceName />
+				<PlusChangesWidget /> {/* plus: bandeja de cambios */}
 
 				{sections.map((section, i) => {
 					const isSectionPin = section.id == I.WidgetSection.Pin;

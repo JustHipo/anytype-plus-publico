@@ -23,6 +23,13 @@ class UpdateManager {
 	init (): void {
 		const { channel } = ConfigManager.config;
 
+		// plus: este actualizador está apagado (isAllowed), así que tampoco registra sus listeners. Comparte el
+		// `autoUpdater` con el de Anytype Plus (plus/update.ts): con ellos puestos, su `update-available` descargaba
+		// la versión antes de que la persona respondiera el diálogo, y «Actualizar ahora» descargaba dos veces.
+		if (!this.isAllowed()) {
+			return;
+		};
+
 		console.log('[UpdateManager].init, channel: ', channel);
 
 		autoUpdater.logger = Util.getLogger();
@@ -79,6 +86,10 @@ class UpdateManager {
 	};
 
 	isAllowed (): boolean {
+		// plus: Anytype Plus no se actualiza solo. El actualizador de Anytype buscaría versiones en el servidor
+		// de Anytype y reemplazaría el fork por el Anytype oficial. Las versiones nuevas salen de GitHub.
+		return false;
+
 		const { config } = ConfigManager;
 
 		if (config.updateDisabled) {

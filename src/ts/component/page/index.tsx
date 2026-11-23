@@ -29,6 +29,7 @@ import PageMainChat from './main/chat';
 import PageMainDate from './main/date';
 import PageMainSettings from './main/settings';
 import PageMainQuickSearch from './main/quickSearch';
+import PlusChangesPage from '../../plus/changesPage'; // plus: bandeja de cambios
 import * as I from 'Interface';
 import Storage from 'Lib/storage';
 import Highlight from 'Lib/highlight';
@@ -63,6 +64,7 @@ const Components = {
 	'main/date':			 PageMainDate,
 	'main/settings':		 PageMainSettings,
 	'main/quickSearch':		 PageMainQuickSearch,
+	'main/plusChanges':		 PlusChangesPage, // plus:
 };
 
 const PageIndex = forwardRef<{}, I.PageComponent>((props, ref) => {

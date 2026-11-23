@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/browser';
 import Storage from 'Lib/storage';
 import { focus } from 'Lib/focus';
 import { membership } from 'Lib/membership';
+import { getPalette } from '../plus/appearance'; // plus:
 
 class Keyboard {
 
@@ -2411,6 +2412,9 @@ class Keyboard {
 		};
 		if (!config.showMenuBar) {
 			cn.push('noMenuBar');
+		};
+		if (getPalette()) {
+			cn.push(U.String.toCamelCase(`plus-palette-${getPalette()}`)); // plus: paleta de colores
 		};
 
 		document.documentElement.className = cn.join(' ');

@@ -1,4 +1,6 @@
 import React, { forwardRef, useRef, useEffect, useImperativeHandle } from 'react';
+import { getCopyForHtmlItem, copyForHtml, PLUS_COPY_ITEM_ID } from '../../plus/copyForHtml'; // plus:
+import { getPageStyleItems, getPageStyleMenuData } from '../../plus/appearance'; // plus:
 import { MenuItemVertical } from 'Component';
 import * as I from 'Interface';
 import { focus } from 'Lib/focus';
@@ -223,7 +225,7 @@ const MenuObject = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 				{ children: [ openObject ] },
 				{ children: [ pageLink, favorite, pinToChannel, linkTo, addCollection, pageCopy, archive, remove, template ] },
 				{ children: [ pageLock, history ] },
-				{ children: [ downloadFile, copyMedia, print, exportSet ] },
+				{ children: [ downloadFile, copyMedia, print, exportSet, getCopyForHtmlItem() ] }, // plus: Copiar para HTML, junto a Exportar
 			]);
 		} else {
 			if (isTemplate) {
@@ -243,8 +245,9 @@ const MenuObject = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 				sections = sections.concat([
 					{ children: [ openObject ] },
 					{ children: [ pageLink, favorite, pinToChannel, linkTo, addCollection, template, pageCopy, archive ] },
+					{ children: (canWrite && !block?.isLocked()) ? getPageStyleItems() : [] }, // plus: fuente y tamaño de la página
 					{ children: [ pageLock, searchText, history ] },
-					{ children: [ pageReload, print, pageExport ] },
+					{ children: [ pageReload, print, pageExport, getCopyForHtmlItem() ] }, // plus: Copiar para HTML, junto a Exportar
 				]);
 			};
 
@@ -372,6 +375,14 @@ const MenuObject = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 				break;
 			};
 
+			// plus: fuente y tamaño de la página
+			case 'plusPageFont':
+			case 'plusPageSize': {
+				menuId = 'select';
+				menuParam.data = getPageStyleMenuData(rootId, item.id, close);
+				break;
+			};
+
 			case 'notification': {
 				const isDiscussion = !isChat && !!object.discussionId;
 				const options = isDiscussion ? U.Menu.discussionNotificationModeOptions() : U.Menu.notificationModeOptions();
@@ -458,6 +469,12 @@ const MenuObject = forwardRef<I.MenuRef, I.Menu>((props, ref) => {
 
 			case 'pageLink': {
 				U.Object.copyLink(object, spaceview, 'web', '');
+				break;
+			};
+
+			// plus:
+			case PLUS_COPY_ITEM_ID: {
+				copyForHtml(object);
 				break;
 			};
 

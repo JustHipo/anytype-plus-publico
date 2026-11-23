@@ -1,0 +1,15 @@
+// plus: tamaño de texto del editor (general × de la página) y fuente de la página.
+// El zoom va en cada hijo de `.blocks` y no en `.blocks`: así un bloque de ancho automático sigue ocupando
+// el mismo ancho de la página y solo crece su contenido (zoom estándar de Chromium).
+
+#editorWrapper .editor > .blocks > * { zoom: calc(var(--plus-text-scale, 1) * var(--plus-page-scale, 1)); }
+
+#editorWrapper[data-plus-font="serif"] .editor > .blocks { font-family: 'Charter', 'Georgia', 'Times New Roman', serif; }
+#editorWrapper[data-plus-font="serif"] .editor > .blocks {
+	.editable, .placeholder { font-family: inherit; }
+}
+
+#editorWrapper[data-plus-font="mono"] .editor > .blocks { font-family: 'Plex', monospace; }
+#editorWrapper[data-plus-font="mono"] .editor > .blocks {
+	.editable, .placeholder { font-family: inherit; }
+}
